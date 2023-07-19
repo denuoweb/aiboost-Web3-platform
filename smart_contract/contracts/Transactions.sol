@@ -6,26 +6,26 @@ import "hardhat/console.sol";
 contract Transactions {
     uint256 public transactionCount;
     event Transfer(address from, address receiver, uint amount, string message, uint256 timestamp);
-  
-    struct TransferStruct {
-        address sender;
-        address payable receiver;
-        uint amount;
-        string message;
-        uint256 timestamp;
-    }
 
-    TransferStruct[] public transactions;
+    mapping(uint256 => address) public senders;
+    mapping(uint256 => address) public receivers;
+    mapping(uint256 => uint) public amounts;
+    mapping(uint256 => string) public messages;
+    mapping(uint256 => uint256) public timestamps;
 
     function addTransaction(address payable receiver, uint amount, string memory message) public {
-        transactionCount += 1;
-        transactions.push(TransferStruct(msg.sender, receiver, amount, message, block.timestamp));
+        senders[transactionCount] = msg.sender;
+        receivers[transactionCount] = receiver;
+        amounts[transactionCount] = amount;
+        messages[transactionCount] = message;
+        timestamps[transactionCount] = block.timestamp;
 
         emit Transfer(msg.sender, receiver, amount, message, block.timestamp);
+
+        transactionCount += 1;
     }
 
-    function getTransactions() public view returns(TransferStruct[] memory) {
-        return transactions;
+    function getTransaction(uint256 index) public view returns(address, address, uint, string memory, uint256) {
+        return (senders[index], receivers[index], amounts[index], messages[index], timestamps[index]);
     }
-
 }
