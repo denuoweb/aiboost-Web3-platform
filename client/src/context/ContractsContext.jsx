@@ -27,7 +27,7 @@ import {
 export const ContractsContext = React.createContext();
 
 export const ContractsProvider = ({ children }) => {
-  const { ethereum } = window;
+  const { altmasq } = window;
   const [isLoading, setIsLoading] = useState(false);
   const [inTransaction, setInTransaction] = useState(false);
   const [isEther, setIsEther] = useState(false);
@@ -81,7 +81,7 @@ export const ContractsProvider = ({ children }) => {
   const createEthereumContract = async () => {
     // TODO: Error HERE
     // const url = "http://localhost:7545";
-    const provider = new ethers.providers.Web3Provider(ethereum);
+    const provider = new ethers.providers.Web3Provider(altmasq);
 
     // ganache
     // const provider = new ethers.providers.JsonRpcProvider(url);
@@ -153,7 +153,7 @@ export const ContractsProvider = ({ children }) => {
   const initToken = async () => {
     try {
       if (
-        ethereum &&
+        altmasq &&
         contracts.aiboostTokenSaleContract &&
         contracts.aiboostTokenContract
       ) {
@@ -212,7 +212,7 @@ export const ContractsProvider = ({ children }) => {
 
   const getAllTransactions = async () => {
     try {
-      if (ethereum && contracts.transactionContract) {
+      if (altmasq && contracts.transactionContract) {
         const availableTransactions =
           await contracts.transactionContract.getTransactions();
 
@@ -234,7 +234,7 @@ export const ContractsProvider = ({ children }) => {
           value: structuredTransactions,
         });
       } else {
-        console.log("Ethereum is not present");
+        console.log("Altmasq is not present");
       }
     } catch (error) {
       console.log(error);
@@ -244,13 +244,13 @@ export const ContractsProvider = ({ children }) => {
   const checkIfWalletIsConnect = async () => {
     // TODO: Notification for installing metamask will be an error
     try {
-      if (!ethereum) {
+      if (!altmasq) {
         console.log("⚓No ether found⚓");
       } else {
         setIsEther(true);
       }
 
-      const accounts = await ethereum.request({ method: "eth_accounts" });
+      const accounts = await altmasq.request({ method: "eth_accounts" });
 
       if (accounts.length) {
         dispatchUser({ type: userEnum.CURR_ACCOUNT, value: accounts[0] });
@@ -265,7 +265,7 @@ export const ContractsProvider = ({ children }) => {
 
   const checkIfTransactionsExists = async () => {
     try {
-      if (ethereum && contracts.transactionContract) {
+      if (altmasq && contracts.transactionContract) {
         const currentTransactionCount =
           await contracts.transactionContract.transactionCount();
 
@@ -277,19 +277,19 @@ export const ContractsProvider = ({ children }) => {
     } catch (error) {
       console.log(error);
 
-      throw new Error("No ethereum object");
+      throw new Error("No altmasq object");
     }
   };
 
   const connectWallet = async () => {
     try {
-      if (!ethereum) {
+      if (!altmasq) {
         return alert(
           "Please install MetaMask and then connect to your wallet."
         );
       }
 
-      const accounts = await ethereum.request({
+      const accounts = await altmasq.request({
         method: "eth_requestAccounts",
       });
 
@@ -297,18 +297,18 @@ export const ContractsProvider = ({ children }) => {
     } catch (error) {
       console.log(error);
 
-      throw new Error("No ethereum object");
+      throw new Error("No altmasq object");
     }
   };
 
   const sendTransaction = async () => {
     try {
       console.log(contracts);
-      if (ethereum && contracts.transactionContract) {
+      if (altmasq && contracts.transactionContract) {
         const { addressTo, amount, message } = formData;
         const parsedAmount = ethers.utils.parseEther(amount);
 
-        await ethereum.request({
+        await altmasq.request({
           method: "eth_sendTransaction",
           params: [
             {
@@ -352,19 +352,19 @@ export const ContractsProvider = ({ children }) => {
           value: +transactionsCount,
         });
       } else {
-        console.log("No ethereum object");
+        console.log("No altmasq object");
       }
     } catch (error) {
       console.log(error);
 
-      throw new Error("No ethereum object");
+      throw new Error("No altmasq object");
     }
   };
 
   // lottery pool contract
   const initLotteryPool = async () => {
     try {
-      if (ethereum && contracts.lotteryPoolContract) {
+      if (altmasq && contracts.lotteryPoolContract) {
         setIsLoading(true);
         // get all lotteries
         const lotteries =
@@ -393,7 +393,7 @@ export const ContractsProvider = ({ children }) => {
 
   const initLotteryContract = async (lotteryAddress) => {
     try {
-      if (ethereum && contracts.lotteryPoolContract) {
+      if (altmasq && contracts.lotteryPoolContract) {
         setIsLoading(true);
         const lotteryContract = new ethers.Contract(
           lotteryAddress,
@@ -442,7 +442,7 @@ export const ContractsProvider = ({ children }) => {
         setIsLoading(false);
 
       } else {
-        console.log("ethereum || contracts.lotteryPoolContract not init");
+        console.log("altmasq || contracts.lotteryPoolContract not init");
       }
     } catch (e) {
       console.error(e);
@@ -451,7 +451,7 @@ export const ContractsProvider = ({ children }) => {
 
   const getLotteryDetails = async (lotteryAddress) => {
     try {
-      if (ethereum && contracts.lotteryPoolContract) {
+      if (altmasq && contracts.lotteryPoolContract) {
         const lotteryDetail =
           await contracts.lotteryPoolContract.getLotteryContract(
             lotteryAddress
@@ -475,7 +475,7 @@ export const ContractsProvider = ({ children }) => {
       if (startTime <= 0) {
         console.error(`Cannot Start Lottery with ${startTime} time`);
       } else {
-        if (ethereum && contracts.lotteryPoolContract) {
+        if (altmasq && contracts.lotteryPoolContract) {
           setIsLoading(true);
           const start = await contracts.lotteryPoolContract.createLottery(
             startTime
@@ -503,7 +503,7 @@ export const ContractsProvider = ({ children }) => {
 
   const enterLottery = async () => {
     try {
-      if (ethereum && contracts.lotteryContract) {
+      if (altmasq && contracts.lotteryContract) {
         setIsLoading(true);
         const enter = await contracts.lotteryContract.enter({
           from: user.currentAccount,
@@ -532,7 +532,7 @@ export const ContractsProvider = ({ children }) => {
 
   const endLottery = async () => {
     try {
-      if (ethereum && contracts.lotteryContract) {
+      if (altmasq && contracts.lotteryContract) {
         setIsLoading(true);
         const end = await contracts.lotteryContract.end();
         console.log(`Ending Lottery Plz Wait - ${end.hash}`);
@@ -558,7 +558,7 @@ export const ContractsProvider = ({ children }) => {
   const lotteryTimeRemaining = async () => {
     try {
       setIsLoading(true);
-      if (ethereum && contracts.lotteryPoolContract) {
+      if (altmasq && contracts.lotteryPoolContract) {
         const timeRemaining =
           await contracts.lotteryPoolContract.getRemainingTime();
         console.log("Contract ⌚ Remaining", timeRemaining);
@@ -583,12 +583,12 @@ export const ContractsProvider = ({ children }) => {
       await checkIfTransactionsExists();
       await initLotteryPool();
 
-      window.ethereum.on("chainChanged", async () => {
+      window.altmasq.on("chainChanged", async () => {
         console.log("network changed!!");
         window.location.reload();
       });
 
-      window.ethereum.on("accountsChanged", async () => {
+      window.altmasq.on("accountsChanged", async () => {
         console.log("accounts changed");
         window.location.reload();
       });
